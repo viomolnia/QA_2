@@ -3,16 +3,18 @@ package delfi;
 import com.sun.org.glassfish.gmbal.Description;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.*;
-import static utils.Utils.*;
+import static utils.Utils.closeAllTabs;
+import static utils.Utils.driver;
 
 public class ArticlesTest {
 
@@ -53,26 +55,30 @@ public class ArticlesTest {
             allArticles = driver.findElements(TITLE);
 
             Map<Integer, WebElement> articles = new HashMap<>();
+            Map<Integer, String> articlesMainWebLinks = new HashMap<>();
             for(int i = 0; i<=4; i++) {
                 articles.put(i, allArticles.get(i));
+                articlesMainWebLinks.put(i, allArticles.get(i).findElement(TITLE_CLASS).getAttribute("href"));
             }
 
             articlesMainWeb = getTitlesAngCommentsFromMainPage(articles);
 
-            articlesTabWeb = getTitleAngCommentsFromNewTab(articles);
+            articlesTabWeb = getTitleAngCommentsFromNewTab(articlesMainWebLinks);
 
             driver.get(MOBILE_VERSION);
 
             allArticlesMobile = driver.findElements(ARTICLE_MOBILE);
 
             Map<Integer, WebElement> articlesMobile = new HashMap<>();
+            Map<Integer, String> articlesMobileLinks = new HashMap<>();
             for(int i = 0; i<=4; i++) {
                 articlesMobile.put(i, allArticlesMobile.get(i));
+                articlesMobileLinks.put(i, allArticlesMobile.get(i).findElement(TITLE_MOBILE).getAttribute("href"));
             }
 
             articlesMainMobile = getTitlesAngCommentsFromMainPageMobile(articlesMobile);
 
-            articlesTabMobile = getTitleAngCommentsFromNewTabMobile(articlesMobile);
+            articlesTabMobile = getTitleAngCommentsFromNewTabMobile(articlesMobileLinks);
 
             result = articlesMainWeb.equals(articlesTabWeb) &&
                     articlesTabWeb.equals(articlesMainMobile) &&
@@ -103,32 +109,16 @@ public class ArticlesTest {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().findElement(TITLE_MOBILE).getText() + getMobileComments(e.getValue())));
     }
 
-    private Map<Integer, String> getTitleAngCommentsFromNewTab(Map<Integer, WebElement> articles) {
+    private Map<Integer, String> getTitleAngCommentsFromNewTab(Map<Integer, String> articlesLinks) {
         Map<Integer, String> result = new HashMap<>();
-        articles.entrySet().forEach(a -> result.putAll(getTitlesAndCommentsFromArticlePage(a.getKey(), a.getValue(), TITLE_ON_TAB)));
+        articlesLinks.entrySet().forEach(a -> result.putAll(getTitlesAndCommentsFromArticlePage(a.getKey(), a.getValue(), TITLE_ON_TAB)));
         return result;
     }
 
-    private Map<Integer, String> getCommentsCountFromTab(Map<Integer, WebElement> articles) {
+    private Map<Integer, String> getTitleAngCommentsFromNewTabMobile(Map<Integer, String> articlesLink) {
         Map<Integer, String> result = new HashMap<>();
-        articles.entrySet().forEach(a -> result.putAll(getTitlesAndCommentsFromArticlePage(a.getKey(), a.getValue(), TITLE_ON_TAB)));
+        articlesLink.entrySet().forEach(a -> result.putAll(getTitlesAndCommentsFromArticlePage(a.getKey(), a.getValue(), TITLE_ON_TAB_MOBILE)));
         return result;
-    }
-
-    private Map<Integer, String> getTitleAngCommentsFromNewTabMobile(Map<Integer, WebElement> articles) {
-        Map<Integer, String> result = new HashMap<>();
-        articles.entrySet().forEach(a -> result.putAll(getTitlesAndCommentsFromArticlePage(a.getKey(), a.getValue(), TITLE_ON_TAB_MOBILE)));
-        return result;
-    }
-
-    private void openInNewTab(WebElement link ) {
-        Actions newTab = new Actions(driver);
-        newTab.keyDown(Keys.CONTROL).keyDown(Keys.SHIFT).click(link).keyUp(Keys.CONTROL).keyUp(Keys.SHIFT).build().perform();
-        //((JavascriptExecutor)driver).executeScript("window.open();"); //open new tab
-        //switchToTabByIdx(1);
-//        driver.get(HOME_PAGE);
-//        link.click();
-
     }
 
     private String getComments(WebElement article) {
@@ -141,15 +131,11 @@ public class ArticlesTest {
         return articleMobileComments.size() > 0 ? articleMobileComments.get(0).getText() : "(0)";
     }
 
-    private Map<Integer, String> getTitlesAndCommentsFromArticlePage(int idx, WebElement article, By title) {
+    private Map<Integer, String> getTitlesAndCommentsFromArticlePage(int idx, String articleTitle, By title) {
         Map<Integer, String> result = new HashMap<>();
-        openInNewTab(article);
-        wait.until(d -> (d.getWindowHandles().size() == 2));
-        switchToTabByIdx(1);
+        driver.get(articleTitle);
         WebElement articleInNewTab = driver.findElement(ARTICLE_IN_NEW_TAB);
         result.put(idx, articleInNewTab.findElement(title).getText() + getComments(articleInNewTab));
-        driver.close();
-        switchToTabByIdx(0);
         return result;
     }
 
