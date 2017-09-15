@@ -1,4 +1,4 @@
-package firstTest.model;
+package javaguru.model;
 
 public class User {
     private String name;
