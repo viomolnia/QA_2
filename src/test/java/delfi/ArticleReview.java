@@ -1,17 +1,19 @@
 package delfi;
 
+import java.util.Map;
+
 public class ArticleReview {
     private int idx;
-    private String titleWithCommentsFromMainPage;
-    private String titleWithCommentsFromArticlePage;
-    private String titleWithCommentsFromMainPageMobile;
-    private String titleWithCommentsFromArticlePageMobile;
-    private String titleWithCommentsFromCommentsPage;
-    private String titleWithCommentsFromCommentsPageMobile;
+    private Map<String, Integer> titleWithCommentsFromMainPage;
+    private Map<String, Integer> titleWithCommentsFromArticlePage;
+    private Map<String, Integer> titleWithCommentsFromMainPageMobile;
+    private Map<String, Integer> titleWithCommentsFromArticlePageMobile;
+    private Map<String, Integer> titleWithCommentsFromCommentsPage;
+    private Map<String, Integer> titleWithCommentsFromCommentsPageMobile;
 
-    public ArticleReview(int idx, String titleWithCommentsFromMainPage, String titleWithCommentsFromArticlePage,
-                         String titleWithCommentsFromMainPageMobile, String titleWithCommentsFromArticlePageMobile,
-                         String titleWithCommentsFromCommentsPage, String titleWithCommentsFromCommentsPageMobile) {
+    public ArticleReview(int idx, Map<String, Integer> titleWithCommentsFromMainPage, Map<String, Integer> titleWithCommentsFromArticlePage,
+                         Map<String, Integer> titleWithCommentsFromMainPageMobile, Map<String, Integer> titleWithCommentsFromArticlePageMobile,
+                         Map<String, Integer> titleWithCommentsFromCommentsPage, Map<String, Integer> titleWithCommentsFromCommentsPageMobile) {
         this.idx = idx;
         this.titleWithCommentsFromMainPage = titleWithCommentsFromMainPage;
         this.titleWithCommentsFromArticlePage = titleWithCommentsFromArticlePage;
@@ -25,11 +27,11 @@ public class ArticleReview {
     public String toString() {
         return "{" +
                 "[" + idx + "]: \n"
-                + titleWithCommentsFromMainPage + ", \n"
-                + titleWithCommentsFromArticlePage + ", \n"
-                + titleWithCommentsFromMainPageMobile + ", \n"
-                + titleWithCommentsFromArticlePageMobile + ", \n"
-                + titleWithCommentsFromCommentsPage + ", \n"
-                + titleWithCommentsFromCommentsPageMobile + "} \n";
+                + titleWithCommentsFromMainPage.toString() + ", \n"
+                + titleWithCommentsFromArticlePage.toString() + ", \n"
+                + titleWithCommentsFromMainPageMobile.toString() + ", \n"
+                + titleWithCommentsFromArticlePageMobile.toString() + ", \n"
+                + titleWithCommentsFromCommentsPage.toString() + ", \n"
+                + titleWithCommentsFromCommentsPageMobile.toString() + "} \n";
     }
 }
