@@ -1,19 +1,20 @@
 package delfi;
 
-import java.util.Map;
-
 public class ArticleReview {
     private int idx;
-    private Map<String, Integer> titleWithCommentsFromMainPage;
-    private Map<String, Integer> titleWithCommentsFromArticlePage;
-    private Map<String, Integer> titleWithCommentsFromMainPageMobile;
-    private Map<String, Integer> titleWithCommentsFromArticlePageMobile;
-    private Map<String, Integer> titleWithCommentsFromCommentsPage;
-    private Map<String, Integer> titleWithCommentsFromCommentsPageMobile;
+    private Article titleWithCommentsFromMainPage;
+    private Article titleWithCommentsFromArticlePage;
+    private Article titleWithCommentsFromMainPageMobile;
+    private Article titleWithCommentsFromArticlePageMobile;
+    private Article titleWithCommentsFromCommentsPage;
+    private Article titleWithCommentsFromCommentsPageMobile;
 
-    public ArticleReview(int idx, Map<String, Integer> titleWithCommentsFromMainPage, Map<String, Integer> titleWithCommentsFromArticlePage,
-                         Map<String, Integer> titleWithCommentsFromMainPageMobile, Map<String, Integer> titleWithCommentsFromArticlePageMobile,
-                         Map<String, Integer> titleWithCommentsFromCommentsPage, Map<String, Integer> titleWithCommentsFromCommentsPageMobile) {
+    public ArticleReview(int idx, Article titleWithCommentsFromMainPage,
+                         Article titleWithCommentsFromArticlePage,
+                         Article titleWithCommentsFromMainPageMobile,
+                         Article titleWithCommentsFromArticlePageMobile,
+                         Article titleWithCommentsFromCommentsPage,
+                         Article titleWithCommentsFromCommentsPageMobile) {
         this.idx = idx;
         this.titleWithCommentsFromMainPage = titleWithCommentsFromMainPage;
         this.titleWithCommentsFromArticlePage = titleWithCommentsFromArticlePage;
@@ -27,11 +28,15 @@ public class ArticleReview {
     public String toString() {
         return "{" +
                 "[" + idx + "]: \n"
-                + titleWithCommentsFromMainPage.toString() + ", \n"
-                + titleWithCommentsFromArticlePage.toString() + ", \n"
-                + titleWithCommentsFromMainPageMobile.toString() + ", \n"
-                + titleWithCommentsFromArticlePageMobile.toString() + ", \n"
-                + titleWithCommentsFromCommentsPage.toString() + ", \n"
-                + titleWithCommentsFromCommentsPageMobile.toString() + "} \n";
+                + "Main age Web:          " + articleToString(titleWithCommentsFromMainPage) + ", \n"
+                + "Article's Page Web:    " + articleToString(titleWithCommentsFromArticlePage) + ", \n"
+                + "Main page Mobile:      " + articleToString(titleWithCommentsFromMainPageMobile) + ", \n"
+                + "Article's page Mobile: " + articleToString(titleWithCommentsFromArticlePageMobile) + ", \n"
+                + "Comments page Web:     " + articleToString(titleWithCommentsFromCommentsPage) + ", \n"
+                + "Comments page Mobile:  " + articleToString(titleWithCommentsFromCommentsPageMobile) + "} \n";
+    }
+
+    private String articleToString(Article article) {
+        return article == null ? "[]" : article.toString();
     }
 }
