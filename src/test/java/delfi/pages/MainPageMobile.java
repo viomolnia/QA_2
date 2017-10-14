@@ -52,18 +52,18 @@ public class MainPageMobile {
     }
 
     public Map<Integer, WebElement> extractArticlesMatchingByTitle(List<WebElement> allArticles, String articleTitle) {
+        LOGGER.info("Save article found by title of mobile version");
         Map<Integer, WebElement> matchingArticles = new HashMap<>();
         allArticles.stream().filter(a -> getTitleFromArticle(a).getText().equals(articleTitle)).forEach(a -> {
-            LOGGER.info("Save article found by title");
             matchingArticles.put(0, a);
         });
         return matchingArticles;
     }
 
     public Map<Integer, String> extractLinksToArticlesMobileByTitle(List<WebElement> allArticles, String articleTitle) {
+        LOGGER.info("Save link of article found by title of mobile version");
         Map<Integer, String>  linksToArticles = new HashMap<>();
         allArticles.stream().filter(a -> getTitleFromArticle(a).getText().equals(articleTitle)).forEach(a -> {
-            LOGGER.info("Save article found by title");
             String link = a.findElements(tagName("a")).get(0).getAttribute("href");
             linksToArticles.put(0, link);
         });
@@ -71,9 +71,9 @@ public class MainPageMobile {
     }
 
     public Map<Integer, String>  extractLinksToArticlesMobile(List<WebElement> allArticles) {
+        LOGGER.info("Save articles' links of mobile version");
         Map<Integer, String>  linksToArticles = new HashMap<>();
         IntStream.range(0, allArticles.size()).forEach(idx -> {
-            LOGGER.info("Save article found by title");
             String link = allArticles.get(idx).findElements(tagName("a")).get(0).getAttribute("href");
             linksToArticles.put(idx, link);
         });
@@ -101,40 +101,36 @@ public class MainPageMobile {
     }
 
     public Map<Integer, String> extractLinksToCommentsPageByTitle(List<WebElement> allArticles, String articleTitle) {
+        LOGGER.info("Save link of article found by title to comments page of mobile version");
         Map<Integer, String> commentsMainWebLinks = new HashMap<>();
-        allArticles.stream().filter(allArticle -> getTitleFromArticle(allArticle).getText().equals(articleTitle)).forEach(allArticle -> {
-            LOGGER.info("Save article's link to comments page");
-            commentsMainWebLinks.put(0, getCommentsLink(allArticle));
-        });
+        allArticles.stream()
+                .filter(allArticle -> getTitleFromArticle(allArticle).getText().equals(articleTitle))
+                .forEach(allArticle -> commentsMainWebLinks.put(0, getCommentsLink(allArticle)));
         return commentsMainWebLinks;
     }
 
     public Map<Integer, String> extractLinksToCommentsPage(List<WebElement> allArticles) {
+        LOGGER.info("Save articles' links to comments page");
         Map<Integer, String> commentsMainWebLinks = new HashMap<>();
-        IntStream.range(0, allArticles.size()).forEach(idx -> {
-            LOGGER.info("Save article's link to comments page");
-            commentsMainWebLinks.put(idx, getCommentsLink(allArticles.get(idx)));
-        });
+        IntStream.range(0, allArticles.size())
+                .forEach(idx -> commentsMainWebLinks.put(idx, getCommentsLink(allArticles.get(idx))));
         return commentsMainWebLinks;
     }
 
     public Map<Integer, Article>  extractTitleWithComments(List<WebElement> allArticles, String articleTitle, Map<Integer, WebElement> matchingArticles) {
+        LOGGER.info("Save articles' title and comments count from main page of mobile version ");
         Map<Integer, Article> articlesFromMainPage = new HashMap<>();
-        allArticles.stream().filter(allArticle -> getTitleFromArticle(allArticle).getText().equals(articleTitle)).forEach(allArticle -> {
-
-            LOGGER.info("Save articles' title and comments count from main page");
-            articlesFromMainPage.putAll(getTitleAndComments(matchingArticles));
-        });
+        allArticles.stream()
+                .filter(allArticle -> getTitleFromArticle(allArticle).getText().equals(articleTitle))
+                .forEach(allArticle -> articlesFromMainPage.putAll(getTitleAndComments(matchingArticles)));
         return articlesFromMainPage;
     }
 
     public Map<Integer, Article>  extractTitleWithComments(List<WebElement> allArticles) {
+        LOGGER.info("Save articles' titlea and comments count from main page of mobile version");
         Map<Integer, Article> articlesFromMainPage = new HashMap<>();
-        IntStream.range(0, allArticles.size()).forEach(idx -> {
-
-            LOGGER.info("Save articles' title and comments count from main page");
-            articlesFromMainPage.putAll(getTitleAndComments(new HashMap<Integer, WebElement>() {{put(idx, allArticles.get(idx));}}));
-        });
+        IntStream.range(0, allArticles.size())
+                .forEach(idx -> articlesFromMainPage.putAll(getTitleAndComments(new HashMap<Integer, WebElement>() {{put(idx, allArticles.get(idx));}})));
         return articlesFromMainPage;
     }
 

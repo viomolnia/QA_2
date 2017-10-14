@@ -32,19 +32,18 @@ public class ArticlePageMobile {
     }
 
     public Map<Integer, Article> getTitlesAndComments(Map<Integer, String> articlesLinks) {
-        LOGGER.info("Getting titles and comments from article page");
+        LOGGER.info("Getting titles and comments from article page of mobile version");
 
         Map<Integer, Article> result = new HashMap<>();
         articlesLinks.forEach((key, value) -> result.putAll(getTitlesAndComments(key, value)));
 
-        LOGGER.info("Titles and comments extracted from article page");
         return result;
     }
 
     private Map<Integer, Article> getTitlesAndComments(int idx, String articleTitle) {
         Map<Integer, Article> result = new HashMap<>();
 
-        LOGGER.info("Open article's page");
+        LOGGER.info("Open article's page of mobile version");
         baseFunctions.goToUrl(articleTitle);
 
         LOGGER.info("Skip age check on article's page");
@@ -57,7 +56,7 @@ public class ArticlePageMobile {
             articleInNewTab = baseFunctions.getElement(ARTICLE_IN_NEW_TAB2);
         }
 
-        LOGGER.info("Get title from article's page");
+        LOGGER.info("Get title from article's page of mobile version");
         String titleText;
         if (articleInNewTab.findElements(TITLE).size() > 0) {
             titleText = articleInNewTab.findElement(TITLE).getText();
@@ -65,7 +64,7 @@ public class ArticlePageMobile {
             titleText = articleInNewTab.getText();
         }
 
-        LOGGER.info("Save title and comments count from article's page");
+        LOGGER.info("Save title and comments count from article's page of mobile version");
         result.put(idx, new Article(titleText, getComments(articleInNewTab)));
         return result;
     }
@@ -74,7 +73,7 @@ public class ArticlePageMobile {
         //Sometimes there ate 'comment-count' class name for the comments, but sometimes - 'commentCount',
         // (also once there was 'tech-comment-count' classname noticed), so we check for correct class name for comments
 
-        LOGGER.info("Get comments count from article's page");
+        LOGGER.info("Get comments count from article's page of mobile version");
         List<WebElement> comments = article.findElements(getCorrectCommentLocator(article));
         String result = comments.size() > 0 ? comments.get(0).getText() : ZERO;
         result = result.substring(result.indexOf('(') + 1, result.indexOf(')'));

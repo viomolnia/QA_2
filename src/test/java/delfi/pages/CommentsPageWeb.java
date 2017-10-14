@@ -29,14 +29,13 @@ public class CommentsPageWeb {
     }
 
     public Map<Integer, Article> getTitleAndComments(Map<Integer, String> commentsLinks) {
-        LOGGER.info("Getting title and comments from comments page");
+        LOGGER.info("Getting title and comments from comments page of web version");
 
         Map<Integer, Article> result = new HashMap<>();
         commentsLinks.entrySet().stream()
                 .filter(a -> !a.getValue().equals(ZERO))
                 .forEach(a -> result.putAll(getTitleAndComments(a.getKey(), a.getValue())));
 
-        LOGGER.info("Title and comments extracted from comments page");
         return result;
     }
 
