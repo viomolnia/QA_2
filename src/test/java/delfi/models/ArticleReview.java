@@ -1,4 +1,6 @@
-package delfi;
+package delfi.models;
+
+import delfi.models.Article;
 
 public class ArticleReview {
     private int idx;
@@ -30,9 +32,9 @@ public class ArticleReview {
                 "[" + idx + "]: \n"
                 + "Main age Web:          " + articleToString(titleWithCommentsFromMainPage) + ", \n"
                 + "Article's Page Web:    " + articleToString(titleWithCommentsFromArticlePage) + ", \n"
+                + "Comments page Web:     " + articleToString(titleWithCommentsFromCommentsPage) + ", \n"
                 + "Main page Mobile:      " + articleToString(titleWithCommentsFromMainPageMobile) + ", \n"
                 + "Article's page Mobile: " + articleToString(titleWithCommentsFromArticlePageMobile) + ", \n"
-                + "Comments page Web:     " + articleToString(titleWithCommentsFromCommentsPage) + ", \n"
                 + "Comments page Mobile:  " + articleToString(titleWithCommentsFromCommentsPageMobile) + "} \n";
     }
 

@@ -1,4 +1,4 @@
-package delfi;
+package delfi.models;
 
 public class Article {
     private String title;
