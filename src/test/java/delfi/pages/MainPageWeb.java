@@ -1,5 +1,6 @@
 package delfi.pages;
 
+import delfi.helpers.CommentsHelper;
 import delfi.models.Article;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,11 +32,9 @@ public class MainPageWeb {
     private static final By TITLE7 = xpath(".//div[contains(@class, 'article-link publishTime')]");
     private static final By TITLE_CLASS1 = className("top2012-title");
     private static final By TITLE_CLASS2 = className("article-title");
-
-    private static final By COMMENT_COUNT = className("comment-count");
-    private static final By COMMENT_COUNT_JOINED = className("commentCount");
-    private static final By TECH_COMMENT_COUNT = className("tech-comment-count");
     private static final String ZERO = "(0)";
+
+    private CommentsHelper commentsHelper = new CommentsHelper();
 
     public MainPageWeb(BaseFunctions baseFunctions) {
         this.baseFunctions = baseFunctions;
@@ -149,32 +148,11 @@ public class MainPageWeb {
     private Map<Integer, Article> getTitleAndComments(Map<Integer, WebElement> articles) {
         LOGGER.info("Extract title and comments from main page of web version");
         return articles.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new Article(getTitleFromArticle(e.getValue()).getText(), getComments(e.getValue()))));
-    }
-
-    private Integer getComments(WebElement article) {
-        //Sometimes there ate 'comment-count' class name for the comments, but sometimes - 'commentCount',
-        // (also once there was 'tech-comment-count' classname noticed), so we check for correct class name for comments
-
-        LOGGER.info("Get comments from main page");
-        List<WebElement> comments = article.findElements(getCorrectCommentLocator(article));
-        String result = comments.size() > 0 ? comments.get(0).getText() : ZERO;
-        result = result.substring(result.indexOf('(') + 1, result.indexOf(')'));
-        return Integer.parseInt(result);
-    }
-
-    private By getCorrectCommentLocator(WebElement element) {
-        if (element.findElements(COMMENT_COUNT).size() > 0) {
-            return COMMENT_COUNT;
-        } else if (element.findElements(COMMENT_COUNT_JOINED).size() > 0){
-            return COMMENT_COUNT_JOINED;
-        } else {
-            return TECH_COMMENT_COUNT;
-        }
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new Article(getTitleFromArticle(e.getValue()).getText(), commentsHelper.getComments(e.getValue()))));
     }
 
     private String getCommentsLink(WebElement article) {
-        List<WebElement> comments = article.findElements(getCorrectCommentLocator(article));
+        List<WebElement> comments = article.findElements(commentsHelper.getCorrectCommentLocator(article));
         return comments.size() > 0 ? comments.get(0).getAttribute("href") : ZERO;
     }
 }
