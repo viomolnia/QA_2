@@ -1,6 +1,7 @@
 package delfi;
 
 import com.sun.org.glassfish.gmbal.Description;
+import delfi.helpers.TestUtilsHelper;
 import delfi.models.Article;
 import delfi.models.ArticleReview;
 import delfi.pages.*;
@@ -10,7 +11,6 @@ import org.junit.Test;
 import org.openqa.selenium.WebElement;
 import utils.BaseFunctions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +27,7 @@ public class DelfiFirstFiveArticlesTest {
     @Description("Check first five articles for matching titles and comments on main page, article's page and comments page")
     public void delfiPageObjectTest() {
         List<ArticleReview> result;
+        TestUtilsHelper testUtilsHelper = new TestUtilsHelper();
         int size = 5;
         int rounds = 0;
         int precision = 3;
@@ -70,7 +71,7 @@ public class DelfiFirstFiveArticlesTest {
             Map<Integer, Article> articlesFromCommentsPageMobile = commentsPageMobile.getTitleAndComments(commentsMainWebLinksMobile);
 
             LOGGER.info("Check title and comments similarity");
-            result = getDifferentTitles(articlesFromMainPage, articlesFromArticlePage, articlesFromCommentsPage, articlesFromMainPageMobile, articlesFromArticlePageMobile, articlesFromCommentsPageMobile, 1);
+            result = testUtilsHelper.getDifferentTitles(articlesFromMainPage, articlesFromArticlePage, articlesFromCommentsPage, articlesFromMainPageMobile, articlesFromArticlePageMobile, articlesFromCommentsPageMobile, 1);
             rounds ++;
 
         } while (result.size() > 0 && rounds <= precision);
@@ -86,52 +87,5 @@ public class DelfiFirstFiveArticlesTest {
 
         LOGGER.info("Test is successful");
 
-    }
-
-    private List<ArticleReview> getDifferentTitles(Map<Integer, Article> titlesWithComments, Map<Integer, Article> titlesWithCommentsInArticleTab,
-                                                   Map<Integer, Article> titlesWithCommentsComment,
-                                                   Map<Integer, Article> titlesWithCommentsMobile, Map<Integer, Article> titlesWithCommentsMobileInArticleTab,
-                                                   Map<Integer, Article> titlesWithCommentsCommentMobile, int size) {
-        List<ArticleReview> result = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-
-            //if there are no comments for article, than there are no title and comments from comments page,
-            //so we check if an article has zero comments and null on comments page
-            if (hasZeroComments(titlesWithComments.get(i)) && hasZeroComments(titlesWithCommentsInArticleTab.get(i)) &&
-                    hasZeroComments(titlesWithCommentsMobile.get(i)) && hasZeroComments(titlesWithCommentsMobileInArticleTab.get(i)) &&
-                    titlesWithCommentsComment.get(i) == null && titlesWithCommentsCommentMobile.get(i) == null    ) {
-
-                //if there are some mismatches, add an article to result
-                if (!(titlesWithComments.get(i).equals(titlesWithCommentsInArticleTab.get(i)) &&
-                        titlesWithCommentsInArticleTab.get(i).equals(titlesWithCommentsMobile.get(i)) &&
-                        titlesWithCommentsMobile.get(i).equals(titlesWithCommentsMobileInArticleTab.get(i)))) {
-
-                    result.add(new ArticleReview(i, titlesWithComments.get(i), titlesWithCommentsInArticleTab.get(i),
-                            titlesWithCommentsMobile.get(i), titlesWithCommentsMobileInArticleTab.get(i),
-                            titlesWithCommentsComment.get(i), titlesWithCommentsCommentMobile.get(i)));
-                }
-            } else {
-
-                //if an article has some comments, we check all the maps with articles
-                if (!(titlesWithComments.get(i).equals(titlesWithCommentsInArticleTab.get(i)) &&
-                        titlesWithCommentsInArticleTab.get(i).equals(titlesWithCommentsMobile.get(i)) &&
-                        titlesWithCommentsMobile.get(i).equals(titlesWithCommentsMobileInArticleTab.get(i)) &&
-                        titlesWithCommentsInArticleTab.get(i).equals(titlesWithCommentsComment.get(i)) &&
-                        titlesWithCommentsComment.get(i).equals(titlesWithCommentsCommentMobile.get(i)))) {
-
-                    //i there are some mismatches, we add an article to result.
-                    result.add(new ArticleReview(i, titlesWithComments.get(i), titlesWithCommentsInArticleTab.get(i),
-                            titlesWithCommentsMobile.get(i), titlesWithCommentsMobileInArticleTab.get(i),
-                            titlesWithCommentsComment.get(i), titlesWithCommentsCommentMobile.get(i)));
-                }
-            }
-        }
-
-        return result;
-    }
-
-    private boolean hasZeroComments(Article article) {
-        return article.getComments() == 0;
     }
 }
