@@ -9,9 +9,9 @@ import java.util.List;
 
 import static org.openqa.selenium.By.className;
 
-public class CommentsExtractor {
+public class CommentsHelper {
 
-    private static final Logger LOGGER = LogManager.getLogger(CommentsExtractor.class);
+    private static final Logger LOGGER = LogManager.getLogger(CommentsHelper.class);
 
 
     private static final String ZERO = "(0)";
