@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import utils.BaseFunctions;
+import utils.CommentHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import static org.openqa.selenium.By.xpath;
 public class MainPageWeb {
 
     private BaseFunctions baseFunctions;
+    private CommentHelper commentHelper = new CommentHelper();
+
     private static final Logger LOGGER = LogManager.getLogger(MainPageWeb.class);
 
     private static final By TITLE1 = xpath(".//h3[@class='top2012-title']");
@@ -159,8 +162,7 @@ public class MainPageWeb {
         LOGGER.info("Get comments from main page");
         List<WebElement> comments = article.findElements(getCorrectCommentLocator(article));
         String result = comments.size() > 0 ? comments.get(0).getText() : ZERO;
-        result = result.substring(result.indexOf('(') + 1, result.indexOf(')'));
-        return Integer.parseInt(result);
+        return commentHelper.extractCommentCountFromString(result);
     }
 
     private By getCorrectCommentLocator(WebElement element) {
