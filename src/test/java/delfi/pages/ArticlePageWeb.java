@@ -43,11 +43,11 @@ public class ArticlePageWeb {
         return result;
     }
 
-    private Map<Integer, Article> getTitlesAndComments(int idx, String articleTitle) {
+    private Map<Integer, Article> getTitlesAndComments(int idx, String articleLink) {
         Map<Integer, Article> result = new HashMap<>();
 
         LOGGER.info("Open article's page of web version");
-        baseFunctions.goToUrl(articleTitle);
+        baseFunctions.goToUrl(articleLink);
 
         LOGGER.info("Skip age check on article's page");
         baseFunctions.skipAgeCheck();
@@ -70,6 +70,32 @@ public class ArticlePageWeb {
         LOGGER.info("Save title and comments count from article's page of web version");
         result.put(idx, new Article(titleText, getComments(articleInNewTab)));
         return result;
+    }
+
+    public Article getTitlesAndComments(String articleLink) {
+        LOGGER.info("Open article's page of web version");
+        baseFunctions.goToUrl(articleLink);
+
+        LOGGER.info("Skip age check on article's page");
+        baseFunctions.skipAgeCheck();
+        WebElement articleInNewTab;
+
+        if (baseFunctions.getElements(ARTICLE_IN_NEW_TAB).size() > 0) {
+            articleInNewTab = baseFunctions.getElement(ARTICLE_IN_NEW_TAB);
+        } else {
+            articleInNewTab = baseFunctions.getElement(ARTICLE_IN_NEW_TAB2);
+        }
+
+        LOGGER.info("Get title from article's page of web version");
+        String titleText;
+        if (articleInNewTab.findElements(TITLE).size() > 0) {
+            titleText = articleInNewTab.findElement(TITLE).getText();
+        } else {
+            titleText = articleInNewTab.getText();
+        }
+
+        LOGGER.info("Save title and comments count from article's page of web version");
+        return new Article(titleText, getComments(articleInNewTab));
     }
 
     private Integer getComments(WebElement article) {

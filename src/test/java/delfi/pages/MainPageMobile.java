@@ -25,14 +25,8 @@ public class MainPageMobile {
 
     private static final Logger LOGGER = LogManager.getLogger(MainPageMobile.class);
 
-    private static final By TITLE = tagName("h1");
     private static final By ARTICLE1 = xpath(".//div[@class='md-mosaic-title']");
     private static final By ARTICLE2 = xpath(".//div[@class='md-specialblock-headline-title']");
-
-    private static final By COMMENT_COUNT = className("comment-count");
-    private static final By COMMENT_COUNT_JOINED = className("commentCount");
-    private static final By TECH_COMMENT_COUNT = className("tech-comment-count");
-    private static final String ZERO = "(0)";
 
     public MainPageMobile(BaseFunctions baseFunctions) {
         this.baseFunctions = baseFunctions;
@@ -77,14 +71,9 @@ public class MainPageMobile {
         return matchingArticles;
     }
 
-    public Map<Integer, String> extractLinksToArticlesMobileByTitle(String articleTitle) {
+    public String extractLinksToArticlesMobileByTitle(ArticleWrapperMobile article) {
         LOGGER.info("Save link of article found by title of mobile version");
-        Map<Integer, String>  linksToArticles = new HashMap<>();
-        getAllArticles().stream().filter(a -> a.getTitleFromArticle().equals(articleTitle)).forEach(a -> {
-            String link = a.getLinkToArticleByTag();
-            linksToArticles.put(0, link);
-        });
-        return linksToArticles;
+        return article.getLinkToArticleByTag();
     }
 
     public Map<Integer, String>  extractLinksToArticlesMobile(List<ArticleWrapperMobile> articles) {
@@ -97,33 +86,9 @@ public class MainPageMobile {
         return linksToArticles;
     }
 
-    private WebElement getTitleFromArticle(WebElement article) {
-        return article.findElements(TITLE).size() > 0 ? article.findElement(TITLE) :
-                article.findElements(tagName("a")).get(0);
-    }
-
-    private By getCorrectCommentLocator(WebElement element) {
-        if (element.findElements(COMMENT_COUNT).size() > 0) {
-            return COMMENT_COUNT;
-        } else if (element.findElements(COMMENT_COUNT_JOINED).size() > 0){
-            return COMMENT_COUNT_JOINED;
-        } else {
-            return TECH_COMMENT_COUNT;
-        }
-    }
-
-    private String getCommentsLink(WebElement article) {
-        List<WebElement> comments = article.findElements(getCorrectCommentLocator(article));
-        return comments.size() > 0 ? comments.get(0).getAttribute("href") : ZERO;
-    }
-
-    public Map<Integer, String> extractLinksToCommentsPageByTitle(String articleTitle) {
+    public String extractLinksToCommentsPageByTitle(ArticleWrapperMobile article) {
         LOGGER.info("Save link of article found by title to comments page of mobile version");
-        Map<Integer, String> commentsMainWebLinks = new HashMap<>();
-        getAllArticles().stream()
-                .filter(a -> a.getTitleFromArticle().equals(articleTitle))
-                .forEach(a -> commentsMainWebLinks.put(0, a.getCommentsLink()));
-        return commentsMainWebLinks;
+        return article.getCommentsLink();
     }
 
     public Map<Integer, String> extractLinksToCommentsPage(List<ArticleWrapperMobile> articles) {
@@ -157,17 +122,17 @@ public class MainPageMobile {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new Article(e.getValue().getTitleFromArticle(), e.getValue().getComments())));
     }
 
-    public Map<Integer, ArticleWrapperMobile> getArticleByTitle(String name) {
-        LOGGER.info("Find article by title of web version");
-        return (new HashMap<Integer, ArticleWrapperMobile>() {{put(0, getMatchingArticleWrapper(name).get(0));}});
+    public Article getTitleAndComments(ArticleWrapperMobile  article) {
+        LOGGER.info("Extract title and comments from main page of mobile version");
+        return new Article(article.getTitleFromArticle(), article.getComments());
     }
 
-    private List<ArticleWrapperMobile> getMatchingArticleWrapper(String name) {
+    public ArticleWrapperMobile getMatchingArticleWrapper(String name) {
         LOGGER.info("Find article by title of web version");
         List<ArticleWrapperMobile> matchingArticles = getAllArticles().stream()
                 .filter(a -> a.getTitleFromArticle().equals(name))
                 .collect(toList());
         assertEquals(1, matchingArticles.size());
-        return matchingArticles;
+        return matchingArticles.get(0);
     }
 }

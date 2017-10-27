@@ -13,7 +13,6 @@ import utils.BaseFunctions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -22,7 +21,7 @@ public class DelfiAtricleByTitleTest {
     private static final Logger LOGGER = LogManager.getLogger(DelfiAtricleByTitleTest.class);
     private static final String DELFI_MAIN_PAGE_WEB_URL = "http://rus.delfi.lv";
     private static final String DELFI_MAIN_PAGE_MOBILE_URL = "http://m.rus.delfi.lv";
-    private static final String DEFINED_TITLE = "На востоке Латвии ночью ожидаются морозы до -8 градусов";
+    private static final String DEFINED_TITLE = "Чем заняться в Риге в выходные: афиша мероприятий";
 
 
     @Test
@@ -31,7 +30,6 @@ public class DelfiAtricleByTitleTest {
         List<ArticleReview> result;
         int rounds = 0;
         int precision = 3;
-        int size = 1;
 
         do {
             MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
@@ -46,40 +44,37 @@ public class DelfiAtricleByTitleTest {
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_WEB_URL);
 
             LOGGER.info("Get article from web main page by title defined in constant variable");
-            Map<Integer, ArticleWrapperWeb> matchingArticlesWeb = mainPageWeb.getArticleByTitle(DEFINED_TITLE);
-
-            LOGGER.info("Assert that there is exactly one article matching defined title");
-            assertTrue(matchingArticlesWeb.size() == 1);
+            ArticleWrapperWeb matchingArticleWeb = mainPageWeb.getArticleWrapperByTitle(DEFINED_TITLE);
 
             LOGGER.info("Get links to article's web page and comments web page");
-            Map<Integer, String> linksToArticlesPages = mainPageWeb.extractLinksToArticlePagesByTitle(DEFINED_TITLE);
-            Map<Integer, String> commentsMainWebLinks = mainPageWeb.extractLinksToCommentsPageByTitle(DEFINED_TITLE);
+            String linkToArticlesPage = mainPageWeb.extractLinksToArticlePagesByTitle(matchingArticleWeb);
+            String linkToCommentsPage = mainPageWeb.extractLinksToCommentsPageByTitle(matchingArticleWeb);
 
             LOGGER.info("Get articles and titles from web main page, article web page and comments web page");
-            Map<Integer, Article> articlesFromMainPage = mainPageWeb.extractTitleWithComments(DEFINED_TITLE, matchingArticlesWeb);
-            Map<Integer, Article> articlesFromArticlePage = articlePageWeb.getTitlesAndComments(linksToArticlesPages);
-            Map<Integer, Article> articlesFromCommentsPage = commentsPageWeb.getTitleAndComments(commentsMainWebLinks);
+            Article articleFromMainPage = mainPageWeb.extractTitleWithComments(matchingArticleWeb);
+            Article articleFromArticlePage = articlePageWeb.getTitlesAndComments(linkToArticlesPage);
+            Article articleFromCommentsPage = commentsPageWeb.getTitleAndComments(linkToCommentsPage);
 
             LOGGER.info("Open main page on mobile version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_MOBILE_URL);
 
             LOGGER.info("Get article from web main page by title defined in constant variable");
-            Map<Integer, ArticleWrapperMobile> matchingArticlesMobile = mainPageMobile.getArticleByTitle(DEFINED_TITLE);
+            ArticleWrapperMobile matchingArticleMobile = mainPageMobile.getMatchingArticleWrapper(DEFINED_TITLE);
 
             LOGGER.info("Get links to article's web page and comments web page");
-            Map<Integer, String> linksToArticlesPagesMobile = mainPageMobile.extractLinksToArticlesMobileByTitle(DEFINED_TITLE);
-            Map<Integer, String> commentsMainWebLinksMobile = mainPageMobile.extractLinksToCommentsPageByTitle(DEFINED_TITLE);
+            String linkToArticlePageMobile = mainPageMobile.extractLinksToArticlesMobileByTitle(matchingArticleMobile);
+            String commentsMainbLinksMobile = mainPageMobile.extractLinksToCommentsPageByTitle(matchingArticleMobile);
 
             LOGGER.info("Get articles and titles from mobile main page, article mobile page and comments mobile page");
-            Map<Integer, Article> articlesFromMainPageMobile = mainPageMobile.extractTitleWithComments(DEFINED_TITLE, matchingArticlesMobile);
-            Map<Integer, Article> articlesFromArticlePageMobile = articlePageMobile.getTitlesAndComments(linksToArticlesPagesMobile);
-            Map<Integer, Article> articlesFromCommentsPageMobile = commentsPageMobile.getTitleAndComments(commentsMainWebLinksMobile);
+            Article articleFromMainPageMobile = mainPageMobile.getTitleAndComments(matchingArticleMobile);
+            Article articleFromArticlePageMobile = articlePageMobile.getTitlesAndComments(linkToArticlePageMobile);
+            Article articleFromCommentsPageMobile = commentsPageMobile.getTitleAndComments(commentsMainbLinksMobile);
 
 
             LOGGER.info("Check title and comments similarity");
-            result = getDifferentTitles(articlesFromMainPage, articlesFromArticlePage,
-                    articlesFromCommentsPage, articlesFromMainPageMobile,
-                    articlesFromArticlePageMobile, articlesFromCommentsPageMobile, size);
+            result = getDifferentTitles(articleFromMainPage, articleFromArticlePage,
+                    articleFromCommentsPage, articleFromMainPageMobile,
+                    articleFromArticlePageMobile, articleFromCommentsPageMobile);
             rounds++;
 
         } while (result.size() > 0 && rounds <= precision);
@@ -97,45 +92,42 @@ public class DelfiAtricleByTitleTest {
 
     }
 
-    private List<ArticleReview> getDifferentTitles(Map<Integer, Article> titlesWithComments, Map<Integer, Article> titlesWithCommentsInArticleTab,
-                                                   Map<Integer, Article> titlesWithCommentsComment,
-                                                   Map<Integer, Article> titlesWithCommentsMobile, Map<Integer, Article> titlesWithCommentsMobileInArticleTab,
-                                                   Map<Integer, Article> titlesWithCommentsCommentMobile, int size) {
+    private List<ArticleReview> getDifferentTitles(Article titlesWithComments, Article titlesWithCommentsInArticleTab,
+                                                   Article titlesWithCommentsComment,
+                                                   Article titlesWithCommentsMobile, Article titlesWithCommentsMobileInArticleTab,
+                                                   Article titlesWithCommentsCommentMobile) {
         List<ArticleReview> result = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
 
             //if there are no comments for article, than there are no title and comments from comments page,
             //so we check if an article has zero comments and null on comments page
-            if (hasZeroComments(titlesWithComments.get(i)) && hasZeroComments(titlesWithCommentsInArticleTab.get(i)) &&
-                    hasZeroComments(titlesWithCommentsMobile.get(i)) && hasZeroComments(titlesWithCommentsMobileInArticleTab.get(i)) &&
-                    titlesWithCommentsComment.get(i) == null && titlesWithCommentsCommentMobile.get(i) == null    ) {
+            if (hasZeroComments(titlesWithComments) && hasZeroComments(titlesWithCommentsInArticleTab) &&
+                    hasZeroComments(titlesWithCommentsMobile) && hasZeroComments(titlesWithCommentsMobileInArticleTab) &&
+                    titlesWithCommentsComment == null && titlesWithCommentsCommentMobile == null    ) {
 
                 //if there are some mismatches, add an article to result
-                if (!(titlesWithComments.get(i).equals(titlesWithCommentsInArticleTab.get(i)) &&
-                        titlesWithCommentsInArticleTab.get(i).equals(titlesWithCommentsMobile.get(i)) &&
-                        titlesWithCommentsMobile.get(i).equals(titlesWithCommentsMobileInArticleTab.get(i)))) {
+                if (!(titlesWithComments.equals(titlesWithCommentsInArticleTab) &&
+                        titlesWithCommentsInArticleTab.equals(titlesWithCommentsMobile) &&
+                        titlesWithCommentsMobile.equals(titlesWithCommentsMobileInArticleTab))) {
 
-                    result.add(new ArticleReview(i, titlesWithComments.get(i), titlesWithCommentsInArticleTab.get(i),
-                            titlesWithCommentsMobile.get(i), titlesWithCommentsMobileInArticleTab.get(i),
-                            titlesWithCommentsComment.get(i), titlesWithCommentsCommentMobile.get(i)));
+                    result.add(new ArticleReview(0, titlesWithComments, titlesWithCommentsInArticleTab,
+                            titlesWithCommentsMobile, titlesWithCommentsMobileInArticleTab,
+                            titlesWithCommentsComment, titlesWithCommentsCommentMobile));
                 }
             } else {
 
                 //if an article has some comments, we check all the maps with articles
-                if (!(titlesWithComments.get(i).equals(titlesWithCommentsInArticleTab.get(i)) &&
-                        titlesWithCommentsInArticleTab.get(i).equals(titlesWithCommentsMobile.get(i)) &&
-                        titlesWithCommentsMobile.get(i).equals(titlesWithCommentsMobileInArticleTab.get(i)) &&
-                        titlesWithCommentsInArticleTab.get(i).equals(titlesWithCommentsComment.get(i)) &&
-                        titlesWithCommentsComment.get(i).equals(titlesWithCommentsCommentMobile.get(i)))) {
+                if (!(titlesWithComments.equals(titlesWithCommentsInArticleTab) &&
+                        titlesWithCommentsInArticleTab.equals(titlesWithCommentsMobile) &&
+                        titlesWithCommentsMobile.equals(titlesWithCommentsMobileInArticleTab) &&
+                        titlesWithCommentsInArticleTab.equals(titlesWithCommentsComment) &&
+                        titlesWithCommentsComment.equals(titlesWithCommentsCommentMobile))) {
 
-                    //i there are some mismatches, we add an article to result.
-                    result.add(new ArticleReview(i, titlesWithComments.get(i), titlesWithCommentsInArticleTab.get(i),
-                            titlesWithCommentsMobile.get(i), titlesWithCommentsMobileInArticleTab.get(i),
-                            titlesWithCommentsComment.get(i), titlesWithCommentsCommentMobile.get(i)));
+                    //if there are some mismatches, we add an article to result.
+                    result.add(new ArticleReview(0, titlesWithComments, titlesWithCommentsInArticleTab,
+                            titlesWithCommentsMobile, titlesWithCommentsMobileInArticleTab,
+                            titlesWithCommentsComment, titlesWithCommentsCommentMobile));
                 }
             }
-        }
 
         return result;
     }

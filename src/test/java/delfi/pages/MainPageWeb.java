@@ -39,7 +39,7 @@ public class MainPageWeb {
         return baseFunctions.getElements(TITLE1);
     }
 
-    public List<WebElement> extractArticles1(int size) {
+    private List<WebElement> extractArticles1(int size) {
         List<WebElement> result = new ArrayList<>();
         List<WebElement> allArticles = baseFunctions.getElements(TITLE1);
 
@@ -88,28 +88,23 @@ public class MainPageWeb {
                 .collect(toList());
     }
 
-    public Map<Integer, ArticleWrapperWeb> getArticleByTitle(String name) {
-        LOGGER.info("Find article by title of web version");
-        return (new HashMap<Integer, ArticleWrapperWeb>() {{put(0, getMatchingArticleWrapper(name).get(0));}});
-    }
-
-    public Map<Integer, String> extractLinksToArticlePagesByTitle(String name) {
+    public String extractLinksToArticlePagesByTitle(ArticleWrapperWeb article) {
         LOGGER.info("Find link to article by title of web version");
-        return (new HashMap<Integer, String>() {{put(0, getMatchingArticleWrapper(name).get(0).getLinkToArticle());}});
+        return article.getLinkToArticle();
     }
 
-    public Map<Integer, String> extractLinksToCommentsPageByTitle(String name) {
+    public String extractLinksToCommentsPageByTitle(ArticleWrapperWeb article) {
         LOGGER.info("Find link to comments page by title of web version");
-        return (new HashMap<Integer, String>() {{put(0, getMatchingArticleWrapper(name).get(0).getCommentsLink());}});
+        return article.getCommentsLink();
     }
 
-    private List<ArticleWrapperWeb> getMatchingArticleWrapper(String name) {
+    public ArticleWrapperWeb getArticleWrapperByTitle(String name) {
         LOGGER.info("Find article by title of web version");
         List<ArticleWrapperWeb> matchingArticles = getAllArticles().stream()
                 .filter(a -> a.getTitleFromArticle().equals(name))
                 .collect(toList());
         assertEquals(1, matchingArticles.size());
-        return matchingArticles;
+        return matchingArticles.get(0);
     }
 
     public Map<Integer, String> extractLinksToArticlePages(List<ArticleWrapperWeb> articles) {
@@ -149,6 +144,10 @@ public class MainPageWeb {
             articlesFromMainPage.putAll(getTitleAndComments(new HashMap<Integer, ArticleWrapperWeb>() {{put(idx, articles.get(idx));}}));
         });
         return articlesFromMainPage;
+    }
+
+    public Article extractTitleWithComments(ArticleWrapperWeb article) {
+        return new Article(article.getTitleFromArticle(),article.getComments());
     }
 
     private Map<Integer, Article> getTitleAndComments(Map<Integer, ArticleWrapperWeb> articles) {

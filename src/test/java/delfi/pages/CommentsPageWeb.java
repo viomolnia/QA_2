@@ -21,7 +21,6 @@ public class CommentsPageWeb {
     private static final By REG_COMMENTS = xpath(".//a[@class='comment-thread-switcher-list-a comment-thread-switcher-list-a-reg']");
     private static final By ANON_COMMENTS = xpath(".//a[@class='comment-thread-switcher-list-a comment-thread-switcher-list-a-anon']");
     private static final String COMMENTS = ": комментарии";
-
     private static final String ZERO = "(0)";
 
     public CommentsPageWeb(BaseFunctions baseFunctions) {
@@ -53,6 +52,19 @@ public class CommentsPageWeb {
 
         result.put(idx, new Article(titleName , totalComments));
         return result;
+    }
+
+    public Article getTitleAndComments(String commentLink) {
+        baseFunctions.goToUrl(commentLink);
+        String fullTitle = baseFunctions.getElement(TITLE_COMMENT_PAGE).getText();
+        String titleName = fullTitle.indexOf(COMMENTS) > 0 ? fullTitle.substring(0, fullTitle.indexOf(COMMENTS)) : fullTitle;
+        String regComments = baseFunctions.getElement(REG_COMMENTS).getText();
+        String anonComments = baseFunctions.getElement(ANON_COMMENTS).getText();
+        int regCommentsValue = Integer.parseInt(regComments.substring(regComments.indexOf('(')+1, regComments.indexOf(')')));
+        int anonCommentsValue = Integer.parseInt(anonComments.substring(anonComments.indexOf('(')+1, anonComments.indexOf(')')));
+        int totalComments = regCommentsValue + anonCommentsValue;
+
+        return new Article(titleName , totalComments);
     }
 
 }
