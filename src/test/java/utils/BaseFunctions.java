@@ -46,12 +46,12 @@ public class BaseFunctions {
     }
 
     public WebElement getElement(By locator) {
-        LOGGER.info("Receiving web element");
+        //LOGGER.info("Receiving web element");
         return driver.findElement(locator);
     }
 
     public List<WebElement> getElements(By locator) {
-        LOGGER.info("Receiving web element");
+        //LOGGER.info("Receiving web element");
         return driver.findElements(locator);
     }
 

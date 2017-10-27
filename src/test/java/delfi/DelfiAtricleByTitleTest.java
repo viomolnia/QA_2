@@ -7,7 +7,8 @@ import delfi.pages.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
-import org.openqa.selenium.WebElement;
+import utils.ArticleWrapperMobile;
+import utils.ArticleWrapperWeb;
 import utils.BaseFunctions;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class DelfiAtricleByTitleTest {
     private static final Logger LOGGER = LogManager.getLogger(DelfiAtricleByTitleTest.class);
     private static final String DELFI_MAIN_PAGE_WEB_URL = "http://rus.delfi.lv";
     private static final String DELFI_MAIN_PAGE_MOBILE_URL = "http://m.rus.delfi.lv";
-    private static final String DEFINED_TITLE = "Генсек НАТО предостерег США от войны с КНДР";
+    private static final String DEFINED_TITLE = "На востоке Латвии ночью ожидаются морозы до -8 градусов";
 
 
     @Test
@@ -30,6 +31,7 @@ public class DelfiAtricleByTitleTest {
         List<ArticleReview> result;
         int rounds = 0;
         int precision = 3;
+        int size = 1;
 
         do {
             MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
@@ -43,57 +45,41 @@ public class DelfiAtricleByTitleTest {
             LOGGER.info("Open main page on web version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_WEB_URL);
 
-            LOGGER.info("Get all articles from web main page");
-            List<WebElement> allArticlesWeb = new ArrayList<>();
-
-            allArticlesWeb.addAll(mainPageWeb.extractArticles1());
-            allArticlesWeb.addAll(mainPageWeb.extractArticles2());
-            allArticlesWeb.addAll(mainPageWeb.extractArticles3());
-            allArticlesWeb.addAll(mainPageWeb.extractArticles4());
-            allArticlesWeb.addAll(mainPageWeb.extractArticles5());
-            allArticlesWeb.addAll(mainPageWeb.extractArticles6());
-            allArticlesWeb.addAll(mainPageWeb.extractArticles7());
-
             LOGGER.info("Get article from web main page by title defined in constant variable");
-            Map<Integer, WebElement> matchingArticlesWeb = mainPageWeb.extractArticlesMatchingByTitle(allArticlesWeb, DEFINED_TITLE);
+            Map<Integer, ArticleWrapperWeb> matchingArticlesWeb = mainPageWeb.getArticleByTitle(DEFINED_TITLE);
 
             LOGGER.info("Assert that there is exactly one article matching defined title");
             assertTrue(matchingArticlesWeb.size() == 1);
 
             LOGGER.info("Get links to article's web page and comments web page");
-            Map<Integer, String> linksToArticlesPages = mainPageWeb.extractLinksToArticlePagesByTitle(allArticlesWeb, DEFINED_TITLE);
-            Map<Integer, String> commentsMainWebLinks = mainPageWeb.extractLinksToCommentsPageByTitle(allArticlesWeb, DEFINED_TITLE);
+            Map<Integer, String> linksToArticlesPages = mainPageWeb.extractLinksToArticlePagesByTitle(DEFINED_TITLE);
+            Map<Integer, String> commentsMainWebLinks = mainPageWeb.extractLinksToCommentsPageByTitle(DEFINED_TITLE);
 
             LOGGER.info("Get articles and titles from web main page, article web page and comments web page");
-            Map<Integer, Article> articlesFromMainPage = mainPageWeb.extractTitleWithComments(allArticlesWeb, DEFINED_TITLE, matchingArticlesWeb);
+            Map<Integer, Article> articlesFromMainPage = mainPageWeb.extractTitleWithComments(DEFINED_TITLE, matchingArticlesWeb);
             Map<Integer, Article> articlesFromArticlePage = articlePageWeb.getTitlesAndComments(linksToArticlesPages);
             Map<Integer, Article> articlesFromCommentsPage = commentsPageWeb.getTitleAndComments(commentsMainWebLinks);
 
             LOGGER.info("Open main page on mobile version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_MOBILE_URL);
 
-            List<WebElement> allArticlesMobile = new ArrayList<>();
-            allArticlesMobile.addAll(mainPageMobile.extractArticles1());
-            allArticlesMobile.addAll(mainPageMobile.extractArticles2());
-
-            LOGGER.info("Get article from mobile main page by title defined in constant variable");
-            Map<Integer, WebElement> matchingArticlesMobile = mainPageMobile.extractArticlesMatchingByTitle(allArticlesMobile, DEFINED_TITLE);
-
-            LOGGER.info("Assert that there is exactly one article matching defined title");
-            assertTrue(matchingArticlesMobile.size() == 1);
+            LOGGER.info("Get article from web main page by title defined in constant variable");
+            Map<Integer, ArticleWrapperMobile> matchingArticlesMobile = mainPageMobile.getArticleByTitle(DEFINED_TITLE);
 
             LOGGER.info("Get links to article's web page and comments web page");
-            Map<Integer, String> linksToArticlesPagesMobile = mainPageMobile.extractLinksToArticlesMobileByTitle(allArticlesMobile, DEFINED_TITLE);
-            Map<Integer, String> commentsMainWebLinksMobile = mainPageMobile.extractLinksToCommentsPageByTitle(allArticlesMobile, DEFINED_TITLE);
+            Map<Integer, String> linksToArticlesPagesMobile = mainPageMobile.extractLinksToArticlesMobileByTitle(DEFINED_TITLE);
+            Map<Integer, String> commentsMainWebLinksMobile = mainPageMobile.extractLinksToCommentsPageByTitle(DEFINED_TITLE);
 
             LOGGER.info("Get articles and titles from mobile main page, article mobile page and comments mobile page");
-            Map<Integer, Article> articlesFromMainPageMobile = mainPageMobile.extractTitleWithComments(allArticlesMobile, DEFINED_TITLE, matchingArticlesMobile);
+            Map<Integer, Article> articlesFromMainPageMobile = mainPageMobile.extractTitleWithComments(DEFINED_TITLE, matchingArticlesMobile);
             Map<Integer, Article> articlesFromArticlePageMobile = articlePageMobile.getTitlesAndComments(linksToArticlesPagesMobile);
             Map<Integer, Article> articlesFromCommentsPageMobile = commentsPageMobile.getTitleAndComments(commentsMainWebLinksMobile);
 
 
             LOGGER.info("Check title and comments similarity");
-            result = getDifferentTitles(articlesFromMainPage, articlesFromArticlePage, articlesFromCommentsPage, articlesFromMainPageMobile, articlesFromArticlePageMobile, articlesFromCommentsPageMobile, 1);
+            result = getDifferentTitles(articlesFromMainPage, articlesFromArticlePage,
+                    articlesFromCommentsPage, articlesFromMainPageMobile,
+                    articlesFromArticlePageMobile, articlesFromCommentsPageMobile, size);
             rounds++;
 
         } while (result.size() > 0 && rounds <= precision);
