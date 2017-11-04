@@ -32,44 +32,58 @@ public class DelfiAtricleByTitleTest {
         int precision = 3;
 
         do {
-            MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
-            ArticlePageWeb articlePageWeb = new ArticlePageWeb(baseFunctions);
-            CommentsPageWeb commentsPageWeb = new CommentsPageWeb(baseFunctions);
-
-            MainPageMobile mainPageMobile = new MainPageMobile(baseFunctions);
-            ArticlePageMobile articlePageMobile = new ArticlePageMobile(baseFunctions);
-            CommentsPageMobile commentsPageMobile = new CommentsPageMobile(baseFunctions);
 
             LOGGER.info("Open main page on web version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_WEB_URL);
+            MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
 
             LOGGER.info("Get article from web main page by title defined in constant variable");
             ArticleWrapperWeb matchingArticleWeb = mainPageWeb.getArticleWrapperByTitle(DEFINED_TITLE);
 
-            LOGGER.info("Get links to article's web page and comments web page");
+            LOGGER.info("Get link to article's web page");
             String linkToArticlesPage = mainPageWeb.extractLinksToArticlePagesByTitle(matchingArticleWeb);
+
+            LOGGER.info("Get link to comments's web page");
             String linkToCommentsPage = mainPageWeb.extractLinksToCommentsPageByTitle(matchingArticleWeb);
 
-            LOGGER.info("Get articles and titles from web main page, article web page and comments web page");
+            LOGGER.info("Get title and comments from article from main web page");
             Article articleFromMainPage = mainPageWeb.extractTitleWithComments(matchingArticleWeb);
-            Article articleFromArticlePage = articlePageWeb.getTitlesAndComments(linkToArticlesPage);
-            Article articleFromCommentsPage = commentsPageWeb.getTitleAndComments(linkToCommentsPage);
+
+            LOGGER.info("Get title and comments from article's web page");
+            baseFunctions.goToUrl(linkToArticlesPage);
+            ArticlePageWeb articlePageWeb = new ArticlePageWeb(baseFunctions);
+            Article articleFromArticlePage = articlePageWeb.getTitlesAndComments();
+
+            LOGGER.info("Get title and comments from comments's web page");
+            baseFunctions.goToUrl(linkToCommentsPage);
+            CommentsPageWeb commentsPageWeb = new CommentsPageWeb(baseFunctions);
+            Article articleFromCommentsPage = commentsPageWeb.getTitleAndComments();
 
             LOGGER.info("Open main page on mobile version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_MOBILE_URL);
 
             LOGGER.info("Get article from web main page by title defined in constant variable");
+            MainPageMobile mainPageMobile = new MainPageMobile(baseFunctions);
             ArticleWrapperMobile matchingArticleMobile = mainPageMobile.getMatchingArticleWrapper(DEFINED_TITLE);
 
-            LOGGER.info("Get links to article's web page and comments web page");
+            LOGGER.info("Get links to article's web page");
             String linkToArticlePageMobile = mainPageMobile.extractLinksToArticlesMobileByTitle(matchingArticleMobile);
-            String commentsMainbLinksMobile = mainPageMobile.extractLinksToCommentsPageByTitle(matchingArticleMobile);
 
-            LOGGER.info("Get articles and titles from mobile main page, article mobile page and comments mobile page");
+            LOGGER.info("Get links to comments' web page");
+            String commentsMainLinksMobile = mainPageMobile.extractLinksToCommentsPageByTitle(matchingArticleMobile);
+
+            LOGGER.info("Get title and comments from article from main mobile page");
             Article articleFromMainPageMobile = mainPageMobile.getTitleAndComments(matchingArticleMobile);
-            Article articleFromArticlePageMobile = articlePageMobile.getTitlesAndComments(linkToArticlePageMobile);
-            Article articleFromCommentsPageMobile = commentsPageMobile.getTitleAndComments(commentsMainbLinksMobile);
 
+            LOGGER.info("Get title and comments from article from article's mobile page");
+            baseFunctions.goToUrl(linkToArticlePageMobile);
+            ArticlePageMobile articlePageMobile = new ArticlePageMobile(baseFunctions);
+            Article articleFromArticlePageMobile = articlePageMobile.getTitlesAndComments();
+
+            LOGGER.info("Get title and comments from article from comments' mobile page");
+            baseFunctions.goToUrl(commentsMainLinksMobile);
+            CommentsPageMobile commentsPageMobile = new CommentsPageMobile(baseFunctions);
+            Article articleFromCommentsPageMobile = commentsPageMobile.getTitleAndComments();
 
             LOGGER.info("Check title and comments similarity");
             result = getDifferentTitles(articleFromMainPage, articleFromArticlePage,
@@ -89,7 +103,6 @@ public class DelfiAtricleByTitleTest {
         baseFunctions.closeAllTabs();
 
         LOGGER.info("Test is successful");
-
     }
 
     private List<ArticleReview> getDifferentTitles(Article titlesWithComments, Article titlesWithCommentsInArticleTab,

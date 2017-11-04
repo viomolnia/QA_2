@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.className;
 
 public class BaseFunctions {
@@ -113,6 +114,10 @@ public class BaseFunctions {
     private void switchToTabByIdx(int idx) {
         Set<String> tabs = driver.getWindowHandles();
         driver.switchTo().window((String) tabs.toArray()[idx]);
+    }
+
+    public boolean isPresent(By locator) {
+        return this.getElements(locator).size() > 0;
     }
 
 }

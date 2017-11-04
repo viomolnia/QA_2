@@ -7,22 +7,24 @@ import delfi.pages.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
-import org.openqa.selenium.WebElement;
 import utils.ArticleWrapperMobile;
 import utils.ArticleWrapperWeb;
 import utils.BaseFunctions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
 public class DelfiFirstFiveArticlesTest {
+
     private BaseFunctions baseFunctions = new BaseFunctions();
     private static final Logger LOGGER = LogManager.getLogger(DelfiFirstFiveArticlesTest.class);
     private static final String DELFI_MAIN_PAGE_WEB_URL = "http://rus.delfi.lv";
     private static final String DELFI_MAIN_PAGE_MOBILE_URL = "http://m.rus.delfi.lv";
+    private static final String ZERO = "(0)";
 
     @Test
     @Description("Check first five articles for matching titles and comments on main page, article's page and comments page")
@@ -33,41 +35,77 @@ public class DelfiFirstFiveArticlesTest {
         int precision = 1;
 
         do {
-            MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
-            ArticlePageWeb articlePageWeb = new ArticlePageWeb(baseFunctions);
-            CommentsPageWeb commentsPageWeb = new CommentsPageWeb(baseFunctions);
-
-            MainPageMobile mainPageMobile = new MainPageMobile(baseFunctions);
-            ArticlePageMobile articlePageMobile = new ArticlePageMobile(baseFunctions);
-            CommentsPageMobile commentsPageMobile = new CommentsPageMobile(baseFunctions);
-
             LOGGER.info("Open main page on web version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_WEB_URL);
+            MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
 
+            LOGGER.info("Get first five articles from main web page");
             List<ArticleWrapperWeb> firstArticlesBySize = mainPageWeb.getFirstArticlesBySize(size);
 
-            LOGGER.info("Get links to article's web page and comments web page");
+            LOGGER.info("Get links to article's page for first five articles");
             Map<Integer, String> linksToArticlesPages = mainPageWeb.extractLinksToArticlePages(firstArticlesBySize);
+
+            LOGGER.info("Get links to comments' page for first five articles");
             Map<Integer, String> commentsMainWebLinks = mainPageWeb.extractLinksToCommentsPage(firstArticlesBySize);
 
-            LOGGER.info("Get articles and titles from web main page, article web page and comments web page");
+            LOGGER.info("Get title and comments for article from main web page for first five articles");
             Map<Integer, Article> articlesFromMainPage = mainPageWeb.extractTitleWithComments(firstArticlesBySize);
-            Map<Integer, Article> articlesFromArticlePage = articlePageWeb.getTitlesAndComments(linksToArticlesPages);
-            Map<Integer, Article> articlesFromCommentsPage = commentsPageWeb.getTitleAndComments(commentsMainWebLinks);
+
+            LOGGER.info("Get title and comments for article from article's page for first five articles");
+            Map<Integer, Article> articlesFromArticlePage = new HashMap<>();
+            linksToArticlesPages.forEach((key, value) -> {
+                baseFunctions.goToUrl(value);
+                ArticlePageWeb articlePageWeb = new ArticlePageWeb(baseFunctions);
+                articlesFromArticlePage.putAll(articlePageWeb.getTitleAndComments(key));
+            });
+
+            LOGGER.info("Get title and comments for article from comments' page for first five articles");
+            Map<Integer, Article> articlesFromCommentsPage = new HashMap<>();
+            commentsMainWebLinks.forEach((key, value) -> {
+                if (value.equals(ZERO)) {
+                    articlesFromCommentsPage.put(key, null);
+                } else {
+                    baseFunctions.goToUrl(value);
+                    CommentsPageWeb commentsPageWeb = new CommentsPageWeb(baseFunctions);
+                    articlesFromCommentsPage.putAll(commentsPageWeb.getTitleAndComments(key));
+                }
+            });
 
             LOGGER.info("Open main page on mobile version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_MOBILE_URL);
+            MainPageMobile mainPageMobile = new MainPageMobile(baseFunctions);
 
+            LOGGER.info("Get first five articles from main mobile page");
             List<ArticleWrapperMobile> firstArticlesBySizeMobile = mainPageMobile.getFirstArticlesBySize(size);
 
-            LOGGER.info("Get links to article's web page and comments web page");
-            Map<Integer, Article> articlesFromMainPageMobile = mainPageMobile.extractTitleWithComments(firstArticlesBySizeMobile);
+            LOGGER.info("Get links to article's page for first five articles from web page");
             Map<Integer, String> linksToArticlesPagesMobile = mainPageMobile.extractLinksToArticlesMobile(firstArticlesBySizeMobile);
+
+            LOGGER.info("Get links to comments' page for first five articles from web page");
             Map<Integer, String> commentsMainWebLinksMobile = mainPageMobile.extractLinksToCommentsPage(firstArticlesBySizeMobile);
 
-            LOGGER.info("Get articles and titles from mobile main page, article mobile page and comments mobile page");
-            Map<Integer, Article> articlesFromArticlePageMobile = articlePageMobile.getTitlesAndComments(linksToArticlesPagesMobile);
-            Map<Integer, Article> articlesFromCommentsPageMobile = commentsPageMobile.getTitleAndComments(commentsMainWebLinksMobile);
+            LOGGER.info("Get titles and comments for first five articles from main web page");
+            Map<Integer, Article> articlesFromMainPageMobile = mainPageMobile.extractTitleWithComments(firstArticlesBySizeMobile);
+
+            LOGGER.info("Get title and comments from article's page for first five articles");
+            Map<Integer, Article> articlesFromArticlePageMobile = new HashMap<>();
+            linksToArticlesPagesMobile.forEach((key, value) -> {
+                baseFunctions.goToUrl(value);
+                ArticlePageMobile articlePageMobile = new ArticlePageMobile(baseFunctions);
+                articlesFromArticlePageMobile.putAll(articlePageMobile.getTitleAndComments(key));
+            });
+
+            LOGGER.info("Get title and comments from comments' page for first five articles");
+            Map<Integer, Article> articlesFromCommentsPageMobile = new HashMap<>();
+            commentsMainWebLinksMobile.forEach((key, value) -> {
+                if (value.equals(ZERO)) {
+                    articlesFromCommentsPageMobile.put(key, null);
+                } else {
+                    baseFunctions.goToUrl(value);
+                    CommentsPageMobile commentsPageMobile = new CommentsPageMobile(baseFunctions);
+                    articlesFromCommentsPageMobile.putAll(commentsPageMobile.getTitleAndCommentsWithIdx(key));
+                }
+            });
 
             LOGGER.info("Check title and comments similarity");
             result = getDifferentTitles(articlesFromMainPage, articlesFromArticlePage, articlesFromCommentsPage, articlesFromMainPageMobile, articlesFromArticlePageMobile, articlesFromCommentsPageMobile, size);

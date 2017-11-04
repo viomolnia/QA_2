@@ -16,6 +16,9 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.xpath;
 
 public class MainPageWeb {
@@ -23,59 +26,80 @@ public class MainPageWeb {
     private BaseFunctions baseFunctions;
     private static final Logger LOGGER = LogManager.getLogger(MainPageWeb.class);
 
-    private static final By TITLE1 = xpath(".//h3[@class='top2012-title']");
-    private static final By TITLE2 = xpath(".//div[contains(@class, 'article-full-image')]");
-    private static final By TITLE3 = xpath(".//div[contains(@class, 'content-half-block')]");
-    private static final By TITLE4 = xpath(".//div[contains(@class, 'content-third-block')]");
-    private static final By TITLE5 = xpath(".//div[contains(@class, 'content-twothirds-block')]");
-    private static final By TITLE6 = xpath(".//div[contains(@class, 'article-full-image')]");
-    private static final By TITLE7 = xpath(".//div[contains(@class, 'article-link publishTime')]");
+    private static final By TOP_TITLES = xpath(".//h3[@class='top2012-title']");
+    private static final By BLOCK_TITLES = xpath(".//div[contains(@class, 'article-full-image')]");
+    private static final By BIG_TITLES = xpath(".//div[contains(@class, 'content-half-block')]");
+    private static final By SMALL_TITLES = xpath(".//div[contains(@class, 'content-third-block')]");
+    private static final By BIGGEST_TITLES = xpath(".//div[contains(@class, 'content-twothirds-block')]");
+    private static final By INLINE_TITLES = xpath(".//div[contains(@class, 'article-full-image')]");
+    private static final By TEXT_TITLES = xpath(".//div[contains(@class, 'article-link publishTime')]");
+
+    private static final By LOGO = className("headerLogo");
+    private static final By DATE = id("nameDays");
+    private static final By WEATHER = id("header-weather");
+    private static final By TOP_MENU_MIDDLE = className("headerSeparatedNav");
+    private static final By TOP_MENU_RIGHT = className("headerSeparatedNavLink");
+    private static final By TOP_BANNER = className("top-banner");
+    private static final By BIG_MENU = xpath(".//nav[contains(@class, 'headerMainNavigation headerSeparatedNav')]");
+    private static final By UNDER_BIG_MENU = xpath(".//nav[contains(@class, 'headerSeparatedNav headerChannelCategories')]");
+    private static final By ADVERTISEMENT = xpath(".//*[@id='column3-top']");
+    private static final By ARTICLES_COLUMN = xpath(".//*[@id='column1-top']");
 
     public MainPageWeb(BaseFunctions baseFunctions) {
         this.baseFunctions = baseFunctions;
+        baseFunctions.isPresent(LOGO);
+        baseFunctions.isPresent(DATE);
+        baseFunctions.isPresent(WEATHER);
+        baseFunctions.isPresent(TOP_MENU_MIDDLE);
+        baseFunctions.isPresent(TOP_MENU_RIGHT);
+        baseFunctions.isPresent(TOP_BANNER);
+        baseFunctions.isPresent(BIG_MENU);
+        baseFunctions.isPresent(UNDER_BIG_MENU);
+        baseFunctions.isPresent(ADVERTISEMENT);
+        baseFunctions.isPresent(ARTICLES_COLUMN);
     }
 
-    private List<WebElement> extractArticles1() {
-        return baseFunctions.getElements(TITLE1);
+    private List<WebElement> extractTopArticles() {
+        return baseFunctions.getElements(TOP_TITLES);
     }
 
-    private List<WebElement> extractArticles1(int size) {
+    private List<WebElement> extractTopArticles(int size) {
         List<WebElement> result = new ArrayList<>();
-        List<WebElement> allArticles = baseFunctions.getElements(TITLE1);
+        List<WebElement> allArticles = baseFunctions.getElements(TOP_TITLES);
 
         IntStream.range(0, size).forEach(idx -> result.add(allArticles.get(idx)));
         return result;
     }
 
-    private List<WebElement> extractArticles2() {
-        return baseFunctions.getElements(TITLE2);
+    private List<WebElement> extractBlockArticles() {
+        return baseFunctions.getElements(BLOCK_TITLES);
     }
-    private List<WebElement> extractArticles3() {
-        return baseFunctions.getElements(TITLE3);
+    private List<WebElement> extractBigArticles3() {
+        return baseFunctions.getElements(BIG_TITLES);
     }
-    private List<WebElement> extractArticles4() {
-        return baseFunctions.getElements(TITLE4);
+    private List<WebElement> extractSmallArticles() {
+        return baseFunctions.getElements(SMALL_TITLES);
     }
-    private List<WebElement> extractArticles5() {
-        return baseFunctions.getElements(TITLE5);
+    private List<WebElement> extractBiggestArticles() {
+        return baseFunctions.getElements(BIGGEST_TITLES);
     }
-    private List<WebElement> extractArticles6() {
-        return baseFunctions.getElements(TITLE6);
+    private List<WebElement> extractInlineArticles() {
+        return baseFunctions.getElements(INLINE_TITLES);
     }
-    private List<WebElement> extractArticles7() {
-        return baseFunctions.getElements(TITLE7);
+    private List<WebElement> extractTextArticles() {
+        return baseFunctions.getElements(TEXT_TITLES);
     }
 
     private List<ArticleWrapperWeb> getAllArticles() {
 
         //LOGGER.info("Get all articles from main page of web version");
-        List<WebElement> articles = extractArticles1();
-        articles.addAll(extractArticles2());
-        articles.addAll(extractArticles3());
-        articles.addAll(extractArticles4());
-        articles.addAll(extractArticles5());
-        articles.addAll(extractArticles6());
-        articles.addAll(extractArticles7());
+        List<WebElement> articles = extractTopArticles();
+        articles.addAll(extractBlockArticles());
+        articles.addAll(extractBigArticles3());
+        articles.addAll(extractSmallArticles());
+        articles.addAll(extractBiggestArticles());
+        articles.addAll(extractInlineArticles());
+        articles.addAll(extractTextArticles());
 
         return articles.stream()
                 .map(webElement -> new ArticleWrapperWeb(baseFunctions, webElement))
@@ -83,7 +107,7 @@ public class MainPageWeb {
     }
 
     public List<ArticleWrapperWeb> getFirstArticlesBySize(int size) {
-        return extractArticles1(size).stream()
+        return extractTopArticles(size).stream()
                 .map(webElement -> new ArticleWrapperWeb(baseFunctions, webElement))
                 .collect(toList());
     }
@@ -125,15 +149,6 @@ public class MainPageWeb {
                 .forEach(idx -> commentsMainWebLinks.put(idx, getAllArticles().get(idx).getCommentsLink()));
 
         return commentsMainWebLinks;
-    }
-
-    public Map<Integer, Article> extractTitleWithComments(String articleTitle, Map<Integer, ArticleWrapperWeb> matchingArticles) {
-        LOGGER.info("Save found article's title and comments count of web version");
-        Map<Integer, Article> articlesFromMainPage = new HashMap<>();
-        getAllArticles().stream()
-                .filter(a -> a.getTitleFromArticle().equals(articleTitle))
-                .forEach(allArticle -> articlesFromMainPage.putAll(getTitleAndComments(matchingArticles)));
-        return articlesFromMainPage;
     }
 
     public Map<Integer, Article> extractTitleWithComments(List<ArticleWrapperWeb> articles) {

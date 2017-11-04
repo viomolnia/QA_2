@@ -27,9 +27,11 @@ public class MainPageMobile {
 
     private static final By ARTICLE1 = xpath(".//div[@class='md-mosaic-title']");
     private static final By ARTICLE2 = xpath(".//div[@class='md-specialblock-headline-title']");
+    private static final By MAIN_WRAPPER = id("md-wrapper");
 
     public MainPageMobile(BaseFunctions baseFunctions) {
         this.baseFunctions = baseFunctions;
+        baseFunctions.isPresent(MAIN_WRAPPER);
     }
 
     private List<ArticleWrapperMobile> getAllArticles() {
@@ -46,7 +48,7 @@ public class MainPageMobile {
                 .collect(toList());
     }
 
-    public List<WebElement> extractArticles1(int size) {
+    private List<WebElement> extractArticles1(int size) {
         List<WebElement> result = new ArrayList<>();
         List<WebElement> allArticles = baseFunctions.getElements(ARTICLE1);
 
@@ -97,15 +99,6 @@ public class MainPageMobile {
         IntStream.range(0,  articles.size())
                 .forEach(idx -> commentsMainWebLinks.put(idx, articles.get(idx).getCommentsLink()));
         return commentsMainWebLinks;
-    }
-
-    public Map<Integer, Article>  extractTitleWithComments(String articleTitle, Map<Integer, ArticleWrapperMobile>  matchingArticles) {
-        LOGGER.info("Save articles' title and comments count from main page of mobile version ");
-        Map<Integer, Article> articlesFromMainPage = new HashMap<>();
-        getAllArticles().stream()
-                .filter(a -> a.getTitleFromArticle().equals(articleTitle))
-                .forEach(allArticle -> articlesFromMainPage.putAll(getTitleAndComments(matchingArticles)));
-        return articlesFromMainPage;
     }
 
     public Map<Integer, Article>  extractTitleWithComments(List<ArticleWrapperMobile> articles) {

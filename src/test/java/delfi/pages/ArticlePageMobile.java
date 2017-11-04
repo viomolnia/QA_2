@@ -12,9 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.tagName;
-import static org.openqa.selenium.By.xpath;
+import static org.openqa.selenium.By.*;
 
 public class ArticlePageMobile {
     private BaseFunctions baseFunctions;
@@ -29,24 +27,15 @@ public class ArticlePageMobile {
     private static final By COMMENT_COUNT_JOINED = className("commentCount");
     private static final By TECH_COMMENT_COUNT = className("tech-comment-count");
 
+    private static final By MAIN_WRAPPER = id("md-wrapper");
+
     public ArticlePageMobile(BaseFunctions baseFunctions) {
         this.baseFunctions = baseFunctions;
+        baseFunctions.isPresent(MAIN_WRAPPER);
     }
 
-    public Map<Integer, Article> getTitlesAndComments(Map<Integer, String> articlesLinks) {
-        LOGGER.info("Getting titles and comments from article page of mobile version");
-
+    public Map<Integer, Article> getTitleAndComments(int idx) {
         Map<Integer, Article> result = new HashMap<>();
-        articlesLinks.forEach((key, value) -> result.putAll(getTitlesAndComments(key, value)));
-
-        return result;
-    }
-
-    private Map<Integer, Article> getTitlesAndComments(int idx, String articleLink) {
-        Map<Integer, Article> result = new HashMap<>();
-
-        LOGGER.info("Open article's page of mobile version");
-        baseFunctions.goToUrl(articleLink);
 
         LOGGER.info("Skip age check on article's page");
         baseFunctions.skipAgeCheck();
@@ -71,10 +60,7 @@ public class ArticlePageMobile {
         return result;
     }
 
-    public Article getTitlesAndComments(String articleLink) {
-        LOGGER.info("Open article's page of mobile version");
-        baseFunctions.goToUrl(articleLink);
-
+    public Article getTitlesAndComments() {
         LOGGER.info("Skip age check on article's page");
         baseFunctions.skipAgeCheck();
         WebElement articleInNewTab;
