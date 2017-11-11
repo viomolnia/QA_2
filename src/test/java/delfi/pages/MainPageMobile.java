@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import utils.ArticleWrapperMobile;
-import utils.ArticleWrapperWeb;
 import utils.BaseFunctions;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class MainPageMobile {
         baseFunctions.isPresent(MAIN_WRAPPER);
     }
 
-    private List<ArticleWrapperMobile> getAllArticles() {
+    public List<ArticleWrapperMobile> getAllArticlesWrappers() {
         List<WebElement> allArticles = extractArticles1();
         allArticles.addAll(extractArticles2());
         return allArticles.stream()
@@ -62,15 +61,6 @@ public class MainPageMobile {
 
     private List<WebElement> extractArticles2() {
         return baseFunctions.getElements(ARTICLE2);
-    }
-
-    public Map<Integer, ArticleWrapperMobile> extractArticlesMatchingByTitle(String articleTitle) {
-        LOGGER.info("Save article found by title of mobile version");
-        Map<Integer, ArticleWrapperMobile> matchingArticles = new HashMap<>();
-        getAllArticles().stream().filter(a -> a.getTitleFromArticle().equals(articleTitle)).forEach(a -> {
-            matchingArticles.put(0, a);
-        });
-        return matchingArticles;
     }
 
     public String extractLinksToArticlesMobileByTitle(ArticleWrapperMobile article) {
@@ -120,9 +110,9 @@ public class MainPageMobile {
         return new Article(article.getTitleFromArticle(), article.getComments());
     }
 
-    public ArticleWrapperMobile getMatchingArticleWrapper(String name) {
+    public ArticleWrapperMobile getMatchingArticleWrapper(List<ArticleWrapperMobile> articles, String name) {
         LOGGER.info("Find article by title of web version");
-        List<ArticleWrapperMobile> matchingArticles = getAllArticles().stream()
+        List<ArticleWrapperMobile> matchingArticles = articles.stream()
                 .filter(a -> a.getTitleFromArticle().equals(name))
                 .collect(toList());
         assertEquals(1, matchingArticles.size());

@@ -74,7 +74,7 @@ public class MainPageWeb {
     private List<WebElement> extractBlockArticles() {
         return baseFunctions.getElements(BLOCK_TITLES);
     }
-    private List<WebElement> extractBigArticles3() {
+    private List<WebElement> extractBigArticles() {
         return baseFunctions.getElements(BIG_TITLES);
     }
     private List<WebElement> extractSmallArticles() {
@@ -90,12 +90,12 @@ public class MainPageWeb {
         return baseFunctions.getElements(TEXT_TITLES);
     }
 
-    private List<ArticleWrapperWeb> getAllArticles() {
+    public List<ArticleWrapperWeb> getAllArticlesWrappers() {
 
         //LOGGER.info("Get all articles from main page of web version");
         List<WebElement> articles = extractTopArticles();
         articles.addAll(extractBlockArticles());
-        articles.addAll(extractBigArticles3());
+        articles.addAll(extractBigArticles());
         articles.addAll(extractSmallArticles());
         articles.addAll(extractBiggestArticles());
         articles.addAll(extractInlineArticles());
@@ -122,9 +122,9 @@ public class MainPageWeb {
         return article.getCommentsLink();
     }
 
-    public ArticleWrapperWeb getArticleWrapperByTitle(String name) {
+    public ArticleWrapperWeb getArticleWrapperByTitle(List <ArticleWrapperWeb> articles, String name) {
         LOGGER.info("Find article by title of web version");
-        List<ArticleWrapperWeb> matchingArticles = getAllArticles().stream()
+        List<ArticleWrapperWeb> matchingArticles = articles.stream()
                 .filter(a -> a.getTitleFromArticle().equals(name))
                 .collect(toList());
         assertEquals(1, matchingArticles.size());
@@ -136,7 +136,7 @@ public class MainPageWeb {
 
         LOGGER.info("Get links to articles pages of web version");
         IntStream.range(0, articles.size())
-                .forEach(idx -> linksToArticlesPages.put(idx, getFirstArticlesBySize(5).get(idx).getLinkToArticle()));
+                .forEach(idx -> linksToArticlesPages.put(idx, articles.get(idx).getLinkToArticle()));
 
         return linksToArticlesPages;
     }
@@ -146,12 +146,12 @@ public class MainPageWeb {
 
         LOGGER.info("Get links to comments page of web version");
         IntStream.range(0, articles.size())
-                .forEach(idx -> commentsMainWebLinks.put(idx, getAllArticles().get(idx).getCommentsLink()));
+                .forEach(idx -> commentsMainWebLinks.put(idx, articles.get(idx).getCommentsLink()));
 
         return commentsMainWebLinks;
     }
 
-    public Map<Integer, Article> extractTitleWithComments(List<ArticleWrapperWeb> articles) {
+    public Map<Integer, Article> extractArticle(List<ArticleWrapperWeb> articles) {
         Map<Integer, Article> articlesFromMainPage = new HashMap<>();
         IntStream.range(0, articles.size()).forEach(idx -> {
 
@@ -161,7 +161,7 @@ public class MainPageWeb {
         return articlesFromMainPage;
     }
 
-    public Article extractTitleWithComments(ArticleWrapperWeb article) {
+    public Article extractArticle(ArticleWrapperWeb article) {
         return new Article(article.getTitleFromArticle(),article.getComments());
     }
 

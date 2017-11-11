@@ -49,7 +49,7 @@ public class DelfiFirstFiveArticlesTest {
             Map<Integer, String> commentsMainWebLinks = mainPageWeb.extractLinksToCommentsPage(firstArticlesBySize);
 
             LOGGER.info("Get title and comments for article from main web page for first five articles");
-            Map<Integer, Article> articlesFromMainPage = mainPageWeb.extractTitleWithComments(firstArticlesBySize);
+            Map<Integer, Article> articlesFromMainPage = mainPageWeb.extractArticle(firstArticlesBySize);
 
             LOGGER.info("Get title and comments for article from article's page for first five articles");
             Map<Integer, Article> articlesFromArticlePage = new HashMap<>();
@@ -67,7 +67,7 @@ public class DelfiFirstFiveArticlesTest {
                 } else {
                     baseFunctions.goToUrl(value);
                     CommentsPageWeb commentsPageWeb = new CommentsPageWeb(baseFunctions);
-                    articlesFromCommentsPage.putAll(commentsPageWeb.getTitleAndComments(key));
+                    articlesFromCommentsPage.putAll(commentsPageWeb.extractArticle(key));
                 }
             });
 

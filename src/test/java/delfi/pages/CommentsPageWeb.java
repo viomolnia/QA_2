@@ -47,7 +47,7 @@ public class CommentsPageWeb {
         baseFunctions.isPresent(ARTICLES_COLUMN);
     }
 
-    public Map<Integer, Article> getTitleAndComments(int idx) {
+    public Map<Integer, Article> extractArticle(int idx) {
         Map<Integer, Article> result = new HashMap<>();
 
         String fullTitle = baseFunctions.getElement(TITLE_COMMENT_PAGE).getText();
@@ -62,7 +62,7 @@ public class CommentsPageWeb {
         return result;
     }
 
-    public Article getTitleAndComments() {
+    public Article extractArticle() {
         String fullTitle = baseFunctions.getElement(TITLE_COMMENT_PAGE).getText();
         String titleName = fullTitle.indexOf(COMMENTS) > 0 ? fullTitle.substring(0, fullTitle.indexOf(COMMENTS)) : fullTitle;
         String regComments = baseFunctions.getElement(REG_COMMENTS).getText();

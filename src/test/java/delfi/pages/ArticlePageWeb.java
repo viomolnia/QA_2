@@ -81,7 +81,7 @@ public class ArticlePageWeb {
         return result;
     }
 
-    public Article getTitlesAndComments() {
+    public Article extractArticle() {
 
         LOGGER.info("Skip age check on article's page");
         baseFunctions.skipAgeCheck();

@@ -36,9 +36,10 @@ public class DelfiAtricleByTitleTest {
             LOGGER.info("Open main page on web version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_WEB_URL);
             MainPageWeb mainPageWeb = new MainPageWeb(baseFunctions);
+            List<ArticleWrapperWeb> allArticlesWeb = mainPageWeb.getAllArticlesWrappers();
 
             LOGGER.info("Get article from web main page by title defined in constant variable");
-            ArticleWrapperWeb matchingArticleWeb = mainPageWeb.getArticleWrapperByTitle(DEFINED_TITLE);
+            ArticleWrapperWeb matchingArticleWeb = mainPageWeb.getArticleWrapperByTitle(allArticlesWeb, DEFINED_TITLE);
 
             LOGGER.info("Get link to article's web page");
             String linkToArticlesPage = mainPageWeb.extractLinksToArticlePagesByTitle(matchingArticleWeb);
@@ -47,24 +48,28 @@ public class DelfiAtricleByTitleTest {
             String linkToCommentsPage = mainPageWeb.extractLinksToCommentsPageByTitle(matchingArticleWeb);
 
             LOGGER.info("Get title and comments from article from main web page");
-            Article articleFromMainPage = mainPageWeb.extractTitleWithComments(matchingArticleWeb);
+            Article articleFromMainPage = mainPageWeb.extractArticle(matchingArticleWeb);
 
             LOGGER.info("Get title and comments from article's web page");
             baseFunctions.goToUrl(linkToArticlesPage);
             ArticlePageWeb articlePageWeb = new ArticlePageWeb(baseFunctions);
-            Article articleFromArticlePage = articlePageWeb.getTitlesAndComments();
+            Article articleFromArticlePage = articlePageWeb.extractArticle();
 
             LOGGER.info("Get title and comments from comments's web page");
             baseFunctions.goToUrl(linkToCommentsPage);
             CommentsPageWeb commentsPageWeb = new CommentsPageWeb(baseFunctions);
-            Article articleFromCommentsPage = commentsPageWeb.getTitleAndComments();
+            Article articleFromCommentsPage = commentsPageWeb.extractArticle();
 
             LOGGER.info("Open main page on mobile version");
             baseFunctions.goToUrl(DELFI_MAIN_PAGE_MOBILE_URL);
 
+
             LOGGER.info("Get article from web main page by title defined in constant variable");
             MainPageMobile mainPageMobile = new MainPageMobile(baseFunctions);
-            ArticleWrapperMobile matchingArticleMobile = mainPageMobile.getMatchingArticleWrapper(DEFINED_TITLE);
+            List<ArticleWrapperMobile> articlesMobile = mainPageMobile .getAllArticlesWrappers();
+
+            LOGGER.info("Get article from mobile main page by title defined in constant variable");
+            ArticleWrapperMobile matchingArticleMobile = mainPageMobile.getMatchingArticleWrapper(articlesMobile, DEFINED_TITLE);
 
             LOGGER.info("Get links to article's web page");
             String linkToArticlePageMobile = mainPageMobile.extractLinksToArticlesMobileByTitle(matchingArticleMobile);
